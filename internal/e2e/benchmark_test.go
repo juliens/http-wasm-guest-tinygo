@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/http-wasm/http-wasm-guest-tinygo/internal/test"
+	handler2 "github.com/http-wasm/http-wasm-host-go/handler"
 	nethttp "github.com/http-wasm/http-wasm-host-go/handler/nethttp"
 )
 
@@ -101,6 +102,7 @@ var benches = map[string]struct {
 	"log": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchLogTinyGo,
+			"Go":     test.BinBenchLogGo,
 			"wat":    test.BinBenchLogWat,
 		},
 		request: get,
@@ -108,6 +110,7 @@ var benches = map[string]struct {
 	"get_uri": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchGetURITinyGo,
+			"Go":     test.BinBenchGetURIGo,
 			"wat":    test.BinBenchGetURIWat,
 		},
 		request: getWithQuery,
@@ -115,6 +118,7 @@ var benches = map[string]struct {
 	"set_uri": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchSetURITinyGo,
+			"Go":     test.BinBenchSetURIGo,
 			"wat":    test.BinBenchSetURIWat,
 		},
 		request: getWithQuery,
@@ -122,6 +126,7 @@ var benches = map[string]struct {
 	"get_header_names none": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchGetHeaderValuesNamesTinyGo,
+			"Go":     test.BinBenchGetHeaderValuesNamesGo,
 			"wat":    test.BinBenchGetHeaderValuesNamesWat,
 		},
 		request: getWithoutHeaders,
@@ -129,6 +134,7 @@ var benches = map[string]struct {
 	"get_header_names": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchGetHeaderValuesNamesTinyGo,
+			"Go":     test.BinBenchGetHeaderValuesNamesGo,
 			"wat":    test.BinBenchGetHeaderValuesNamesWat,
 		},
 		request: get,
@@ -136,6 +142,7 @@ var benches = map[string]struct {
 	"get_header_names large": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchGetHeaderValuesNamesTinyGo,
+			"Go":     test.BinBenchGetHeaderValuesNamesGo,
 			"wat":    test.BinBenchGetHeaderValuesNamesWat,
 		},
 		request: getWithLargeHeader,
@@ -143,6 +150,7 @@ var benches = map[string]struct {
 	"get_header_values exists": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchGetHeaderValuesTinyGo,
+			"Go":     test.BinBenchGetHeaderValuesGo,
 			"wat":    test.BinBenchGetHeaderValuesWat,
 		},
 		request: get,
@@ -150,6 +158,7 @@ var benches = map[string]struct {
 	"get_header_values not exists": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchGetHeaderValuesTinyGo,
+			"Go":     test.BinBenchGetHeaderValuesGo,
 			"wat":    test.BinBenchGetHeaderValuesWat,
 		},
 		request: getWithoutHeaders,
@@ -157,6 +166,7 @@ var benches = map[string]struct {
 	"set_header_value exists": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchSetHeaderValueTinyGo,
+			"Go":     test.BinBenchSetHeaderValueGo,
 			"wat":    test.BinBenchSetHeaderValueWat,
 		},
 		request: get,
@@ -164,6 +174,7 @@ var benches = map[string]struct {
 	"set_header_value not exists": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchSetHeaderValueTinyGo,
+			"Go":     test.BinBenchSetHeaderValueGo,
 			"wat":    test.BinBenchSetHeaderValueWat,
 		},
 		request: getWithoutHeaders,
@@ -171,6 +182,7 @@ var benches = map[string]struct {
 	"add_header_value exists": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchAddHeaderValueTinyGo,
+			"Go":     test.BinBenchAddHeaderValueGo,
 			"wat":    test.BinBenchAddHeaderValueWat,
 		},
 		request: get,
@@ -178,6 +190,7 @@ var benches = map[string]struct {
 	"add_header_value not exists": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchAddHeaderValueTinyGo,
+			"Go":     test.BinBenchAddHeaderValueGo,
 			"wat":    test.BinBenchAddHeaderValueWat,
 		},
 		request: getWithoutHeaders,
@@ -185,6 +198,7 @@ var benches = map[string]struct {
 	"remove_header exists": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchRemoveHeaderTinyGo,
+			"Go":     test.BinBenchRemoveHeaderGo,
 			"wat":    test.BinBenchRemoveHeaderWat,
 		},
 		request: get,
@@ -192,6 +206,7 @@ var benches = map[string]struct {
 	"remove_header not exists": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchRemoveHeaderTinyGo,
+			"Go":     test.BinBenchRemoveHeaderGo,
 			"wat":    test.BinBenchRemoveHeaderWat,
 		},
 		request: getWithoutHeaders,
@@ -199,6 +214,7 @@ var benches = map[string]struct {
 	"read_body": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchReadBodyTinyGo,
+			"Go":     test.BinBenchReadBodyGo,
 			"wat":    test.BinBenchReadBodyWat,
 		},
 		request: post,
@@ -206,6 +222,7 @@ var benches = map[string]struct {
 	"read_body_stream": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchReadBodyStreamTinyGo,
+			"Go":     test.BinBenchReadBodyStreamGo,
 			"wat":    test.BinBenchReadBodyStreamWat,
 		},
 		request: post,
@@ -213,6 +230,7 @@ var benches = map[string]struct {
 	"read_body_stream large": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchReadBodyStreamTinyGo,
+			"Go":     test.BinBenchReadBodyStreamGo,
 			"wat":    test.BinBenchReadBodyStreamWat,
 		},
 		request: postLarge,
@@ -220,6 +238,7 @@ var benches = map[string]struct {
 	"write_body": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchWriteBodyTinyGo,
+			"Go":     test.BinBenchWriteBodyGo,
 			"wat":    test.BinBenchWriteBodyWat,
 		},
 		request: get,
@@ -227,6 +246,7 @@ var benches = map[string]struct {
 	"set_status_code": {
 		bins: map[string][]byte{
 			"TinyGo": test.BinBenchSetStatusCodeTinyGo,
+			"Go":     test.BinBenchSetStatusCodeGo,
 			"wat":    test.BinBenchSetStatusCodeWat,
 		},
 		request: get,
@@ -247,7 +267,7 @@ func Benchmark(b *testing.B) {
 func benchmark(b *testing.B, name string, bin []byte, handler http.Handler, newRequest func(string) *http.Request) {
 	ctx := context.Background()
 
-	mw, err := nethttp.NewMiddleware(ctx, bin)
+	mw, err := nethttp.NewMiddleware(ctx, bin, handler2.NoExport(true))
 	if err != nil {
 		b.Fatal(err)
 	}

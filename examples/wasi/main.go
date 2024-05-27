@@ -21,6 +21,7 @@ func main() {
 	}
 	httpwasm.HandleRequestFn = handleRequest
 	httpwasm.HandleResponseFn = handleResponse
+	httpwasm.HandleInMain()
 }
 
 // handleRequest prints HTTP requests and responses to the console using os.Stdout.

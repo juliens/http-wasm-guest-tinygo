@@ -131,6 +131,18 @@ func SetMethod(ptr, size uint32) {
 	setMethod(ptr, size)
 }
 
+func SetNext(next uint64) {
+	setNext(next)
+}
+
+func GetCallback() uint64 {
+	return getCallback()
+}
+
+func GetArg(i uint32) uint32 {
+	return getArg(i)
+}
+
 func GetURI(ptr uint32, limit BufLimit) (len uint32) {
 	return getURI(ptr, limit)
 }

@@ -1,4 +1,4 @@
-//go:build tinygo.wasm
+//go:build tinygo.wasm || wasip1
 
 package imports
 
@@ -60,3 +60,12 @@ func setStatusCode(statusCode uint32)
 
 //go:wasmimport http_handler get_source_addr
 func getSourceAddr(ptr uint32, limit BufLimit) (len uint32)
+
+//go:wasmimport http_handler set_next
+func setNext(uint64)
+
+//go:wasmimport http_handler get_callback
+func getCallback() uint64
+
+//go:wasmimport http_handler get_arg
+func getArg(uint32) uint32

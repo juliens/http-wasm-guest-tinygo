@@ -12,11 +12,17 @@ import (
 //go:embed testdata/bench/tinygo/log/main.wasm
 var BinBenchLogTinyGo []byte
 
+//go:embed testdata/bench/go/log/main.wasm
+var BinBenchLogGo []byte
+
 //go:embed testdata/bench/wat/log.wasm
 var BinBenchLogWat []byte
 
 //go:embed testdata/bench/tinygo/get_uri/main.wasm
 var BinBenchGetURITinyGo []byte
+
+//go:embed testdata/bench/go/get_uri/main.wasm
+var BinBenchGetURIGo []byte
 
 //go:embed testdata/bench/wat/get_uri.wasm
 var BinBenchGetURIWat []byte
@@ -24,11 +30,17 @@ var BinBenchGetURIWat []byte
 //go:embed testdata/bench/tinygo/set_uri/main.wasm
 var BinBenchSetURITinyGo []byte
 
+//go:embed testdata/bench/go/set_uri/main.wasm
+var BinBenchSetURIGo []byte
+
 //go:embed testdata/bench/wat/set_uri.wasm
 var BinBenchSetURIWat []byte
 
 //go:embed testdata/bench/tinygo/get_header_names/main.wasm
 var BinBenchGetHeaderValuesNamesTinyGo []byte
+
+//go:embed testdata/bench/go/get_header_names/main.wasm
+var BinBenchGetHeaderValuesNamesGo []byte
 
 //go:embed testdata/bench/wat/get_header_names.wasm
 var BinBenchGetHeaderValuesNamesWat []byte
@@ -36,11 +48,17 @@ var BinBenchGetHeaderValuesNamesWat []byte
 //go:embed testdata/bench/tinygo/get_header_values/main.wasm
 var BinBenchGetHeaderValuesTinyGo []byte
 
+//go:embed testdata/bench/go/get_header_values/main.wasm
+var BinBenchGetHeaderValuesGo []byte
+
 //go:embed testdata/bench/wat/get_header_values.wasm
 var BinBenchGetHeaderValuesWat []byte
 
 //go:embed testdata/bench/tinygo/set_header_value/main.wasm
 var BinBenchSetHeaderValueTinyGo []byte
+
+//go:embed testdata/bench/go/set_header_value/main.wasm
+var BinBenchSetHeaderValueGo []byte
 
 //go:embed testdata/bench/wat/set_header_value.wasm
 var BinBenchSetHeaderValueWat []byte
@@ -48,11 +66,17 @@ var BinBenchSetHeaderValueWat []byte
 //go:embed testdata/bench/tinygo/add_header_value/main.wasm
 var BinBenchAddHeaderValueTinyGo []byte
 
+//go:embed testdata/bench/go/add_header_value/main.wasm
+var BinBenchAddHeaderValueGo []byte
+
 //go:embed testdata/bench/wat/add_header_value.wasm
 var BinBenchAddHeaderValueWat []byte
 
 //go:embed testdata/bench/tinygo/remove_header/main.wasm
 var BinBenchRemoveHeaderTinyGo []byte
+
+//go:embed testdata/bench/go/remove_header/main.wasm
+var BinBenchRemoveHeaderGo []byte
 
 //go:embed testdata/bench/wat/remove_header.wasm
 var BinBenchRemoveHeaderWat []byte
@@ -60,8 +84,14 @@ var BinBenchRemoveHeaderWat []byte
 //go:embed testdata/bench/tinygo/read_body/main.wasm
 var BinBenchReadBodyTinyGo []byte
 
+//go:embed testdata/bench/go/read_body/main.wasm
+var BinBenchReadBodyGo []byte
+
 //go:embed testdata/bench/tinygo/write_body/main.wasm
 var BinBenchWriteBodyTinyGo []byte
+
+//go:embed testdata/bench/go/write_body/main.wasm
+var BinBenchWriteBodyGo []byte
 
 //go:embed testdata/bench/wat/write_body.wasm
 var BinBenchWriteBodyWat []byte
@@ -72,11 +102,17 @@ var BinBenchReadBodyWat []byte
 //go:embed testdata/bench/tinygo/read_body_stream/main.wasm
 var BinBenchReadBodyStreamTinyGo []byte
 
+//go:embed testdata/bench/go/read_body_stream/main.wasm
+var BinBenchReadBodyStreamGo []byte
+
 //go:embed testdata/bench/wat/read_body_stream.wasm
 var BinBenchReadBodyStreamWat []byte
 
 //go:embed testdata/bench/tinygo/set_status_code/main.wasm
 var BinBenchSetStatusCodeTinyGo []byte
+
+//go:embed testdata/bench/go/set_status_code/main.wasm
+var BinBenchSetStatusCodeGo []byte
 
 //go:embed testdata/bench/wat/set_status_code.wasm
 var BinBenchSetStatusCodeWat []byte
@@ -119,10 +155,19 @@ var HandlerExampleWASI = http.HandlerFunc(func(w http.ResponseWriter, r *http.Re
 var BinE2EFeaturesTinyGo []byte
 
 //go:embed testdata/e2e/tinygo/handle_response/main.wasm
-var BinHandleResponse []byte
+var BinHandleResponseTinyGo []byte
 
 //go:embed testdata/e2e/tinygo/log/main.wasm
-var BinE2ELog []byte
+var BinE2ELogTinyGo []byte
+
+//go:embed testdata/e2e/tinygo/features/main.wasm
+var BinE2EFeaturesGo []byte
+
+//go:embed testdata/e2e/go/handle_response/main.wasm
+var BinHandleResponseGo []byte
+
+//go:embed testdata/e2e/go/log/main.wasm
+var BinE2ELogGo []byte
 
 // binExample instead of go:embed as files aren't relative to this directory.
 func binExample(name string) []byte {

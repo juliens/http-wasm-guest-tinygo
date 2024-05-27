@@ -42,11 +42,12 @@ func (r *recordingLogger) Log(ctx context.Context, level api.LogLevel, message s
 
 func Test_EndToEnd(t *testing.T) {
 	type testCase struct {
-		name    string
-		bin     []byte
-		request func(url string) *http.Request
-		next    http.Handler
-		test    func(t *testing.T, content []byte, logMessages []string, stdout, stderr string)
+		name     string
+		bin      []byte
+		request  func(url string) *http.Request
+		next     http.Handler
+		noExport bool
+		test     func(t *testing.T, content []byte, logMessages []string, stdout, stderr string)
 	}
 
 	tests := []testCase{
@@ -98,7 +99,7 @@ func Test_EndToEnd(t *testing.T) {
 			test:    testConsole,
 		},
 		{
-			name: "features",
+			name: "features with tinygo",
 			bin:  test.BinE2EFeaturesTinyGo,
 			request: func(url string) (req *http.Request) {
 				req, _ = http.NewRequest(http.MethodGet, url, nil)
@@ -114,8 +115,8 @@ func Test_EndToEnd(t *testing.T) {
 			},
 		},
 		{
-			name: "handle_response",
-			bin:  test.BinHandleResponse,
+			name: "handle_response with tinygo",
+			bin:  test.BinHandleResponseTinyGo,
 			request: func(url string) (req *http.Request) {
 				req, _ = http.NewRequest(http.MethodGet, url, nil)
 				return
@@ -128,8 +129,58 @@ func Test_EndToEnd(t *testing.T) {
 			},
 		},
 		{
-			name: "log",
-			bin:  test.BinE2ELog,
+			name: "log with tinygo",
+			bin:  test.BinE2ELogTinyGo,
+			request: func(url string) (req *http.Request) {
+				req, _ = http.NewRequest(http.MethodGet, url, nil)
+				return
+			},
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(200)
+			}),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				require.Empty(t, content)
+				require.Empty(t, stderr)
+				require.Empty(t, stdout)
+				require.Equal(t, []string{"before", "after"}, logMessages)
+			},
+		},
+		{
+			name:     "features with go",
+			bin:      test.BinE2EFeaturesGo,
+			noExport: true,
+			request: func(url string) (req *http.Request) {
+				req, _ = http.NewRequest(http.MethodGet, url, nil)
+				return
+			},
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			}),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				require.Equal(t, "buffer_request|buffer_response", string(content))
+				require.Empty(t, stderr)
+				require.Empty(t, stdout)
+				require.Empty(t, logMessages)
+			},
+		},
+		{
+			name:     "handle_response with go",
+			bin:      test.BinHandleResponseGo,
+			noExport: true,
+			request: func(url string) (req *http.Request) {
+				req, _ = http.NewRequest(http.MethodGet, url, nil)
+				return
+			},
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(200)
+			}),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				require.Equal(t, "43", string(content))
+			},
+		},
+		{
+			name:     "log with go",
+			bin:      test.BinE2ELogGo,
+			noExport: true,
 			request: func(url string) (req *http.Request) {
 				req, _ = http.NewRequest(http.MethodGet, url, nil)
 				return
@@ -156,7 +207,7 @@ func Test_EndToEnd(t *testing.T) {
 
 			// Configure and compile the WebAssembly guest binary.
 			mw, err := nethttp.NewMiddleware(testCtx, tc.bin,
-				handler.Logger(&logger), handler.ModuleConfig(moduleConfig))
+				handler.Logger(&logger), handler.ModuleConfig(moduleConfig), handler.NoExport(tc.noExport))
 			if err != nil {
 				t.Error(err)
 			}

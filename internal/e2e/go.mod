@@ -6,7 +6,7 @@ require (
 	github.com/http-wasm/http-wasm-guest-tinygo v0.0.0
 	github.com/http-wasm/http-wasm-host-go v0.5.1
 	github.com/stretchr/testify v1.8.4
-	github.com/tetratelabs/wazero v1.2.0
+	github.com/tetratelabs/wazero v1.5.0
 )
 
 require (
@@ -16,3 +16,5 @@ require (
 )
 
 replace github.com/http-wasm/http-wasm-guest-tinygo => ../../
+
+replace github.com/http-wasm/http-wasm-host-go => /Users/juliensalleyron/dev/plugins-sandbox/http-wasm-host-go

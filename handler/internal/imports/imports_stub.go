@@ -1,4 +1,4 @@
-//go:build !tinygo.wasm
+//go:build !tinygo.wasm && !wasip1
 
 package imports
 
@@ -82,3 +82,9 @@ func setStatusCode(statusCode uint32) {}
 func getSourceAddr(ptr uint32, limit BufLimit) (len uint32) {
 	return 0
 }
+
+func setNext(uint642 uint64) {}
+
+func getCallback() uint64 { return 0 }
+
+func getArg(uint32) uint32 { return 0 }
