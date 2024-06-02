@@ -8,6 +8,7 @@ import (
 
 	httpwasm "github.com/http-wasm/http-wasm-guest-tinygo/handler"
 	"github.com/http-wasm/http-wasm-guest-tinygo/handler/api"
+	"github.com/juliens/wasm-goexport/guest"
 )
 
 // main ensures buffering is available on the host.
@@ -21,6 +22,7 @@ func main() {
 	}
 	httpwasm.HandleRequestFn = handleRequest
 	httpwasm.HandleResponseFn = handleResponse
+	guest.SetExports(httpwasm.GetExports())
 }
 
 // handleRequest prints HTTP requests and responses to the console using os.Stdout.

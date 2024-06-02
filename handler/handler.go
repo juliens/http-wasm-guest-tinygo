@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/http-wasm/http-wasm-guest-tinygo/handler/api"
+	_ "github.com/juliens/wasm-goexport/guest"
 )
 
 // Host is the current host that invokes HandleRequestFn.
@@ -17,12 +18,13 @@ var HandleRequestFn api.HandleRequest = func(api.Request, api.Response) (next bo
 // handleRequest is only exported to the host.
 //
 //go:export handle_request
-func handleRequest() (ctxNext uint64) { //nolint
+func handleRequest() (ctxNext uint64) { // nolint
 	next, reqCtx := HandleRequestFn(wasmRequest{}, wasmResponse{})
 	ctxNext = uint64(reqCtx) << 32
 	if next {
 		ctxNext |= 1
 	}
+
 	return
 }
 
@@ -33,7 +35,7 @@ var HandleResponseFn api.HandleResponse = func(uint32, api.Request, api.Response
 // handleResponse is only exported to the host.
 //
 //go:export handle_response
-func handleResponse(reqCtx uint32, isError uint32) { //nolint
+func handleResponse(reqCtx uint32, isError uint32) { // nolint
 	isErrorB := false
 	if isError == 1 {
 		isErrorB = true

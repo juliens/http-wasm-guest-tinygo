@@ -5,12 +5,14 @@ import (
 
 	httpwasm "github.com/http-wasm/http-wasm-guest-tinygo/handler"
 	"github.com/http-wasm/http-wasm-guest-tinygo/handler/api"
+	"github.com/juliens/wasm-goexport/guest"
 )
 
 func main() {
 	httpwasm.Host.EnableFeatures(api.FeatureBufferResponse)
 	httpwasm.HandleRequestFn = handleRequest
 	httpwasm.HandleResponseFn = handleResponse
+	guest.SetExports(httpwasm.GetExports())
 }
 
 const magic = uint32(43)

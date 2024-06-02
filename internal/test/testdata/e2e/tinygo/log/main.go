@@ -3,11 +3,13 @@ package main
 import (
 	httpwasm "github.com/http-wasm/http-wasm-guest-tinygo/handler"
 	"github.com/http-wasm/http-wasm-guest-tinygo/handler/api"
+	"github.com/juliens/wasm-goexport/guest"
 )
 
 func main() {
 	httpwasm.HandleRequestFn = logBefore
 	httpwasm.HandleResponseFn = logAfter
+	guest.SetExports(httpwasm.GetExports())
 }
 
 var log = httpwasm.Host.Log

@@ -3,10 +3,12 @@ package main
 import (
 	"github.com/http-wasm/http-wasm-guest-tinygo/handler"
 	"github.com/http-wasm/http-wasm-guest-tinygo/handler/api"
+	"github.com/juliens/wasm-goexport/guest"
 )
 
 func main() {
 	handler.HandleRequestFn = readBody
+	guest.SetExports(handler.GetExports())
 }
 
 var empty = make([]byte, 0)

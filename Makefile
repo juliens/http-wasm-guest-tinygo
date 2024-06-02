@@ -6,11 +6,17 @@ golangci_lint := github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.0
 testdata:
 	@$(MAKE) build.wat
 	@$(MAKE) build.tinygo
+	@$(MAKE) build.go
 
 tinygo_sources := $(wildcard examples/*/*.go) $(wildcard internal/test/testdata/*/*.go) $(wildcard internal/test/testdata/*/*/*.go) $(wildcard internal/test/testdata/*/*/*/*.go)
 build.tinygo: $(tinygo_sources)
 	@for f in $^; do \
 	    tinygo build -o $$(echo $$f | sed -e 's/\.go/\.wasm/') -scheduler=none --no-debug -target=wasi $$f; \
+	done
+
+build.go: $(tinygo_sources)
+	@for f in $^; do \
+	    GOOS=wasip1 GOARCH=wasm go build -o $$(echo $$f | sed -e 's/\.go/\_go.wasm/') $$f; \
 	done
 
 wat_sources := $(wildcard internal/test/testdata/*/*/*.wat)

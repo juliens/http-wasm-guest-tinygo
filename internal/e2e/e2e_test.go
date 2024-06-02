@@ -42,12 +42,17 @@ func (r *recordingLogger) Log(ctx context.Context, level api.LogLevel, message s
 
 func Test_EndToEnd(t *testing.T) {
 	type testCase struct {
-		name    string
-		bin     []byte
-		request func(url string) *http.Request
-		next    http.Handler
-		test    func(t *testing.T, content []byte, logMessages []string, stdout, stderr string)
+		name        string
+		bin         []byte
+		request     func(url string) *http.Request
+		guestConfig []byte
+		next        http.Handler
+		test        func(t *testing.T, content []byte, logMessages []string, stdout, stderr string)
 	}
+	srv := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte("Hello World"))
+	}))
 
 	tests := []testCase{
 		{
@@ -84,12 +89,69 @@ func Test_EndToEnd(t *testing.T) {
 			},
 		},
 		{
+			name:    "example router guest response with go",
+			bin:     test.BinExampleRouterGo,
+			request: get,
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				t.Fatal("host should not see this request")
+			}),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				// should see the response written by the guest.
+				require.Equal(t, "hello", string(content))
+				require.Empty(t, stderr)
+				require.Empty(t, stdout)
+				require.Empty(t, logMessages)
+			},
+		},
+		{
+			name:    "example httpcall guest response with go",
+			bin:     test.BinExampleHTTPCallGo,
+			request: get,
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				t.Fatal("host should not see this request")
+			}),
+			guestConfig: []byte(srv.URL),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				// should see the response written by the guest.
+				require.Equal(t, "Hello World", string(content))
+				require.Empty(t, stderr)
+				require.Empty(t, stdout)
+				require.Empty(t, logMessages)
+			},
+		},
+		{
+			name: "example router host response with go",
+			bin:  test.BinExampleRouterGo,
+			request: func(url string) (req *http.Request) {
+				req, _ = http.NewRequest(http.MethodGet, url+"/host", nil)
+				return
+			},
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Ensure the handler saw the re-written path.
+				require.Equal(t, "/", r.URL.Path)
+			}),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				require.Empty(t, content)
+				require.Empty(t, stderr)
+				require.Empty(t, stdout)
+				require.Empty(t, logMessages)
+			},
+		},
+		{
 			name:    "example wasi tinygo",
 			bin:     test.BinExampleWASI,
 			request: test.RequestExampleWASI,
 			next:    test.HandlerExampleWASI,
 			test:    testConsole,
 		},
+		{
+			name:    "example wasi go",
+			bin:     test.BinExampleWASIGo,
+			request: test.RequestExampleWASI,
+			next:    test.HandlerExampleWASI,
+			test:    testConsole,
+		},
+
 		{
 			name:    "example wasi wat", // makes sure the implementations match!
 			bin:     test.BinExampleWASIWat,
@@ -100,6 +162,22 @@ func Test_EndToEnd(t *testing.T) {
 		{
 			name: "features",
 			bin:  test.BinE2EFeaturesTinyGo,
+			request: func(url string) (req *http.Request) {
+				req, _ = http.NewRequest(http.MethodGet, url, nil)
+				return
+			},
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			}),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				require.Equal(t, "buffer_request|buffer_response", string(content))
+				require.Empty(t, stderr)
+				require.Empty(t, stdout)
+				require.Empty(t, logMessages)
+			},
+		},
+		{
+			name: "features with go",
+			bin:  test.BinE2EFeaturesGo,
 			request: func(url string) (req *http.Request) {
 				req, _ = http.NewRequest(http.MethodGet, url, nil)
 				return
@@ -128,8 +206,39 @@ func Test_EndToEnd(t *testing.T) {
 			},
 		},
 		{
+			name: "handle_response with go",
+			bin:  test.BinHandleResponseGo,
+			request: func(url string) (req *http.Request) {
+				req, _ = http.NewRequest(http.MethodGet, url, nil)
+				return
+			},
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(200)
+			}),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				require.Equal(t, "43", string(content))
+			},
+		},
+		{
 			name: "log",
 			bin:  test.BinE2ELog,
+			request: func(url string) (req *http.Request) {
+				req, _ = http.NewRequest(http.MethodGet, url, nil)
+				return
+			},
+			next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(200)
+			}),
+			test: func(t *testing.T, content []byte, logMessages []string, stdout, stderr string) {
+				require.Empty(t, content)
+				require.Empty(t, stderr)
+				require.Empty(t, stdout)
+				require.Equal(t, []string{"before", "after"}, logMessages)
+			},
+		},
+		{
+			name: "log with go",
+			bin:  test.BinE2ELogGo,
 			request: func(url string) (req *http.Request) {
 				req, _ = http.NewRequest(http.MethodGet, url, nil)
 				return
@@ -156,7 +265,7 @@ func Test_EndToEnd(t *testing.T) {
 
 			// Configure and compile the WebAssembly guest binary.
 			mw, err := nethttp.NewMiddleware(testCtx, tc.bin,
-				handler.Logger(&logger), handler.ModuleConfig(moduleConfig))
+				handler.Logger(&logger), handler.ModuleConfig(moduleConfig), handler.GuestConfig(tc.guestConfig))
 			if err != nil {
 				t.Error(err)
 			}
